@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
-
+const reactionSchema = require("./reaction");
+const date = require("../utils/date.js");
 
 const thoughtSchema = new Schema(
   {
@@ -12,31 +13,25 @@ const thoughtSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      
+      get: (timestamp) => {
+        date(timestamp);
+      },
     },
     username: {
       type: String,
       required: true,
     },
-    reactions: {
-
-    }
-
+    reactions: [reactionSchema],
   },
-    reactionCount: [
-      {
-        type: Schema.Types.ReactionId,
-        ref: 'reaction'
-      },  
-    ],
   {
     toJSON: {
       virtuals: true,
+      getters: true,
     },
     id: false,
   }
 );
 
-const Course = model("course", courseSchema);
+const Thought = model("thought", thoughtSchema);
 
-module.exports = Course;
+module.exports = Thought;
