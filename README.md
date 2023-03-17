@@ -1,7 +1,7 @@
 # Social-Network-API
 Creating a social network API!
 
-##Summary:
+## Summary:
 In this project I was tasked with creating a social network API that has users, friends, thoughts and reactions. I created models for what each portion would look like, routed them together, and created controllers. The final product is manageable in Insomnia. 
 
 ## Deployed Video:
