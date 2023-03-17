@@ -2,12 +2,12 @@ const { Thought, User } = require("../models");
 
 module.exports = {
   getThoughts(req, res) {
-    Course.find()
+    Thought.find()
       .then((thoughts) => res.json(thoughts))
       .catch((err) => res.status(500).json(err));
   },
   getSingleThought(req, res) {
-    Course.findOne({ _id: req.params.thoughtId })
+    Thought.findOne({ _id: req.params.thoughtId })
       .select("-__v")
       .then((thought) =>
         !thought
@@ -29,9 +29,8 @@ module.exports = {
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: "No thought with that ID" })
-          : Student.deleteMany({ _id: { $in: thought.users } })
+          : res.json(thought)
       )
-      .then(() => res.json({ message: "thoughts and users deleted!" }))
       .catch((err) => res.status(500).json(err));
   },
   updateThought(req, res) {
@@ -43,7 +42,39 @@ module.exports = {
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: "No thought with this id!" })
-          : res.json(course)
+          : res.json(thought)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+  addReaction(req, res) {
+    console.log("You are adding a reaction");
+    console.log(req.body);
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $addToSet: { reactions: req.body } },
+      { runValidators: true, new: true }
+    )
+      .then((thought) =>
+        !thought
+          ? res
+              .status(404)
+              .json({ message: "No thought found with that ID :(" })
+          : res.json(thought)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+  deleteReaction(req, res) {
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $pull: { reactions: { reactionId: req.params.reactionId } } },
+      { runValidators: true, new: true }
+    )
+      .then((thought) =>
+        !thought
+          ? res
+              .status(404)
+              .json({ message: "No thought found with that ID :(" })
+          : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
   },

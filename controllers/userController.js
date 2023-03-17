@@ -7,7 +7,6 @@ module.exports = {
       .then(async (users) => {
         const userObj = {
           users,
-          headCount: await headCount(),
         };
         return res.json(userObj);
       })
@@ -24,7 +23,6 @@ module.exports = {
           ? res.status(404).json({ message: "No user with that ID" })
           : res.json({
               user,
-              grade: await grade(req.params.userId),
             })
       )
       .catch((err) => {
@@ -42,31 +40,19 @@ module.exports = {
       .then((user) =>
         !user
           ? res.status(404).json({ message: "No such user exists" })
-          : Course.findOneAndUpdate(
-              { users: req.params.userId },
-              { $pull: { users: req.params.userId } },
-              { new: true }
-            )
-      )
-      .then((reaction) =>
-        !reaction
-          ? res.status(404).json({
-              message: "user deleted, but no reactions found",
-            })
-          : res.json({ message: "user successfully deleted" })
+          : res.json(user)
       )
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
-
-  addReaction(req, res) {
-    console.log("You are adding a reaction");
+  addFriend(req, res) {
+    console.log("You are adding a friend");
     console.log(req.body);
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $addToSet: { Reactions: req.body } },
+      { $addToSet: { friends: req.params.friendId } },
       { runValidators: true, new: true }
     )
       .then((User) =>
@@ -76,10 +62,10 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
-  removeReaction(req, res) {
+  removeFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $pull: { reaction: { reactionId: req.params.reactionId } } },
+      { $pull: { friends: req.params.friendId } },
       { runValidators: true, new: true }
     )
       .then((user) =>
